@@ -1,0 +1,26 @@
+1. 找入口点：
+    找到使用的board的链接脚本(board/ti/am335x/u-boot.lds)，以 ENTRY() 修饰的即为入口点，根据该文件可知入口点为 _start
+
+2. 入口点 _start 在文件 arch/arm/lib/vectors.S中
+    调用 reset(arch/arm/cpu/armv7/start.S)
+        调用 save_boot_params(arch/arm/cpu/armv7/omap-common/lowlevel_init.S), 将ROMCODE中的变量(寄存器r0)保存在OMAP_SRAM_SCRATCH_BOOT_PARAMS(0x4030B824)处
+        设置SVC mode、关闭FIQ和IRQ
+        调用cpu_init_cp15 初始化cp15(TLB,MMU,iCache,分支预测，对齐检测等相关设置)
+        调用cpu_init_crit
+            调用lowlevel_init(arch/arm/cpu/armv7/lowlevel_init.S)
+                设置栈为0x4030FF20
+                将gd地址放入寄存器r9
+                调用s_init(arch/arm/cpu/armv7/am335x/board.c)
+                    调用save_omap_boot_params(arch/arm/cpu/armv7/omap-common/boot_common.c)
+                        获取ROMCODE中的变量，根据启动方式填充gd变量
+                    关闭看门狗
+                    初始化串口和控制台，此后可使用串口打印信息
+                    初始化SDRAM
+        调用_main(arch/arm/lib/ctr0.S)
+            调用board_init_f(arch/arm/lib/spl.c)
+                清除bss
+                调用board_init_r(common/spl/spl.c)
+                    根据启动方式从不同的启动设备中拷贝u-boot.img至SDRAM
+                    跳转至u-boot.img的入口点启动u-boot
+        
+        
