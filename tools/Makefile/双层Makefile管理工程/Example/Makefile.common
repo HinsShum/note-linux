@@ -1,0 +1,102 @@
+# include by the top Makefile
+#
+# @file /Makefile.common
+# 
+# Copyright (C) 2019
+#
+# This file is include in the general Makefile, the libs Makefile and the src Makefile
+# Different optimize settings for library and source files can be realized by using arguments
+# Compiler optimize settings:
+#   -O0 no opeimize, reduce compilation time and make debugging produce the expected results(default).
+#   -O1 optimize, reduce code size and execution time, without much increase of compilation time.
+#   -O2 optimize, reduce code execution time compared to 'O1', increase of compilation time.
+#   -O3 optimize, turns on all optimizations, further increase of compilation time.
+#   -Os optimize for size, enable all '-O2' optimizations taht do not typically increase code size and other code size optimizations.
+# Recommended optimize settings for release version: -O3
+# Recommended optimize settings for debug version: -O0
+# Vaild parameters:
+#   Optimize=0 --> optimize files using the -O0 setting
+#   Optimize=1 --> optimize files using the -O1 setting
+#   Optimize=2 --> optimize files using the -O2 setting
+#   Optimize=3 --> optimize files using the -O3 setting
+#   Optimize=s --> optimize files using the -Os setting
+#
+# all   --> build all
+# clean --> clean project
+# tshow --> show optimize settings
+# Example:
+#   make Optimize=0 all tshow CROSS_COMPILER=arm-none-eabi-
+# 
+# @author HinsShum hinsshum@qq.com
+
+export TOP := $(shell readlink -f "$(dir $(lastword $(MAKEFILE_LIST)))")
+
+# Compiler
+ifndef CROSS_COMPILER
+CROSS_COMPILER := arm-none-eabi-
+endif
+export CROSS_COMPILER
+
+# Linker file
+ifndef LINKER_FILE
+LINKER_FILE := config/linker.ld
+endif
+
+export CC := $(CROSS_COMPILER)gcc
+export LD := $(CROSS_COMPILER)ld
+export OBJCOPY := $(CROSS_COMPILER)objcopy
+export OBJDUMP := $(CROSS_COMPILER)objdump
+export AR := $(CROSS_COMPILER)ar
+export GDB := $(CROSS_COMPILER)gdb
+
+# Compile flags
+COMPILEFLAGS := -g -mcpu=cortex-m3 -mthumb
+
+# Commands for general Makefile and src Makefile
+ifeq ($(Optimize), 0)
+	COMPILEFLAGS += -O0
+	INFOTEXTSRC := src (no optimize, -O0)
+else ifeq ($(Optimize), 1)
+	COMPILEFLAGS += -O1
+	INFOTEXTSRC := src (optimize time+ size+, -O1)
+else ifeq ($(Optimize), 2)
+	COMPILEFLAGS += -O2
+	INFOTEXTSRC := src (optimize time+ size+, -O2)
+else ifeq ($(Optimize), 3)
+	COMPILEFLAGS += -O3
+	INFOTEXTSRC := src (optimize time+ size+, -O3)
+else ifeq ($(Optimize), s)
+	COMPILEFLAGS += -Os
+	INFOTEXTSRC := src (optimize time+ size+, -Os)
+else
+	COMPILEFLAGS += -O0
+	INFOTEXTSRC := src (default optimize, -O0)
+endif
+
+ifndef DIRS_OBJ
+DIRS_OBJ := obj
+endif
+export DIRS_OBJ
+
+FIND := $(strip $(findstring /usr/bin/find,$(shell which find -a)))
+ifndef FIND
+	$(error "error: Please install the Unix environment first!")
+endif
+
+$(shell test -d $(DIRS_OBJ) || mkdir -p $(DIRS_OBJ))
+export DIRS_OBJ
+
+INCLUDE := $(strip $(patsubst ./%,-I$(TOP)/%,$(shell $(FIND) . -name "inc*")))
+INCLUDE += $(patsubst %,-I%,$(TOP))
+
+export CFLAGS := $(COMPILEFLAGS) -Wall -Werror -std=c99 $(INCLUDE) -ffunction-sections -fdata-sections
+LDFLAGS := $(COMPILEFLAGS) -fno-exceptions -nostartfiles --specs=nosys.specs
+LDFLAGS += -Wl,-Map,$(DIRS_OBJ)/mapfile,--cref -Wl,--gc-sections,-T$(LINKER_FILE)
+
+DIRS_MAKEFILE := $(filter-out ./,$(dir $(strip $(patsubst ./%,%,$(shell $(FIND) . -name "Makefile")))))
+
+DIRS_ALL := $(strip $(patsubst ./%,%,$(shell $(FIND) . -type d)))
+
+DIRS_FILTEROUT := . .slickedit .git .vscode $(DIRS_OBJ)
+DIRS_SRC := $(filter-out $(foreach dd,$(DIRS_FILTEROUT),$(foreach d,$(DIRS_ALL),$(if $(findstring $(dd),$(d)),$(d)))),$(DIRS_ALL))
+
