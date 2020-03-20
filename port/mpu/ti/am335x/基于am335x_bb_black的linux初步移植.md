@@ -169,5 +169,5 @@ U-boot# boot
 
 登录成功：
 
-![login](F:\Work_Directory\6.arch\arm\ti\am335x\reference\notes\images\login.png)
+![login](images\login.png)
 
