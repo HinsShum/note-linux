@@ -33,6 +33,15 @@ BOOT_MODE[1:0] = 0b00时，有两种启动流程分支：
 
 imx6ulx具有两个 `USDHC  `通道，SD和MMC可以任意选择一个通道接入。
 
+```
+如：SD卡接入eSDHC1
+BOOT_MODE[1:0] = 10
+BOOT_CFG1[7:5] = 010
+BOOT_CFG2[4:3] = 00
+```
+
+![SD_CFG](picture\SD_CFG.png)
+
 从SD/MMC启动时，`ROM CODE`会从启动设备拷贝4K字节的数据至内部的OCRAM，该4K字节中必须包含合法的`IVT`、`DCD`、`BOOT DATA STRUCTURES`的内容，保证设备的正常启动。
 
 ![IVT_offset](picture\IVTOffset.png)
@@ -42,3 +51,7 @@ imx6ulx具有两个 `USDHC  `通道，SD和MMC可以任意选择一个通道接�
 `Image Vector Table`组成：
 
 ![IVT](picture\IVT.png)
+
+### 制作SD启动卡
+
+烧录uboot镜像至sd卡：`sudo dd if=u-boot-dtb.imx of=/dev/sdx bs=512 seek=2 conv=fdatasync`
