@@ -1,0 +1,15 @@
+#slickedit
+*.slickedit
+
+#vscode
+*.vscode
+
+#build
+build
+
+#db
+.sconsign.dblite
+
+#obj
+Obj
+*.exe

@@ -1,0 +1,11 @@
+# dir
+.slickedit
+.vs
+obj
+build
+
+# output files
+*.bin
+*.dis
+*.elf
+*.hex
