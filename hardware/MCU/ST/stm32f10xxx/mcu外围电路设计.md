@@ -36,3 +36,49 @@ stm32f1xx系列通常有三种启动方式，根据boot[0-1]引脚的接法不�
 
 ### 3.1 无源晶体振荡器电路设计要点
 
+​		对于无源晶振，为了获取更高的时钟精度，通常都需要对其进行匹配([晶振设计指导：AN2867](https://www.st.com/content/ccc/resource/technical/document/application_note/c6/eb/5e/11/e3/69/43/eb/CD00221665.pdf/files/CD00221665.pdf/jcr:content/translations/en.CD00221665.pdf))
+
+#### 3.1.1负载电容匹配
+
+​		通常晶振匹配电路如下（其中CL1和CL2就是晶振的匹配电容，通常CL1=CL2）：
+
+![晶振匹配电路](image/晶振匹配电路.png)
+
+​		其中`RF`反馈电阻的存在使得逆变器`Inv`充当了放大器的功能，通常在绝大多数的ST的微控制器中，`RF`反馈电阻都集成在器件内部。
+
+​		`CL1`和`CL2`为无源晶振的匹配电容，其与`Cs`（OSC_IN与OSC_OUT的引脚电容和PCB的寄生电容之和）共同决定了无源晶振的负载电容`CL`，其公式如下：
+
+![CL公式](image/CL公式.png)
+
+​		其中`CL`从选择的无源晶振的数据手册中获取，`Cs`中包括OSC引脚之间的电容和PCB的寄生电容，OSC引脚之间的电容可从stm32f1xx系列的手册中获取，PCB的寄生电容通常为2pF至5pF。
+
+​		以stm32f1xx系列和晶光华`SMD5032 8MHZ 20PF 10PPM`的匹配为例，查看晶振手册可知其`CL`为20pF，查看stm32f1xx的数据手册([datasheet](https://www.st.com/resource/en/datasheet/stm32f103ve.pdf))可知其OSC_IN的输入电容为5pF，PCB的寄生电容取5pF，因此，`CL`为20pF，`Cs`为10pF，代入公式：
+
+![匹配电容计算公式](image/匹配电容计算公式.png)
+
+其中，通常`CL1`与`CL2`相等，因此计算得到`CL1=CL2=(CL-Cs)*2=20pF`
+
+![OSC_IN输入电容](image/OSC_IN输入电容.png)
+
+#### 3.1.2 晶振跨导
+
+​		为了晶振可以正常起振，并稳定运行，就必须有足够的增益来维持。如果振荡器的跨导参数`gm`已指定(stm32f1xx手册可查)，则晶振的振荡回路临界增益`gmcrit`必须比`gm`小5倍以上。
+
+![gm和gmcrit](image/gm和gmcrit.png)
+
+​		查手册([datasheet](https://www.st.com/resource/en/datasheet/stm32f103ve.pdf))可知`gm`为25mA/V
+
+![gm参数](image/gm参数.png)
+
+​	接着计算`gmcrit`，其公式为：
+
+![gmcrit公式](image/gmcrit公式.png)
+
+​		查看晶振的手册可知，`C0`为5pF，`F`为8M，`CL`为20pF，`ESR`为80欧姆：
+
+![晶光华手册](image/晶光华手册.png)
+
+​		因此，计算得到`gmcrit`=0.5048mA/V，所以`gm/gmcrit`=49.5，满足5倍的要求，所以晶振的选择是合适的，若计算得到小于5倍，则应该更换晶振。
+
+#### 3.1.4 驱动电平(Driver Level)
+
