@@ -32,6 +32,12 @@ function(FILTER_OUT FILTEROUT_VARIABLE INPUT_VARIABLE OUTPUT_VARIABLE)
     set(${OUTPUT_VARIABLE} ${OUTPUT_TMP} PARENT_SCOPE)
 endfunction(FILTER_OUT)
 
+function(DIRNAME INPUT OUTPUT)
+    execute_process(COMMAND dirname ${${INPUT}} COMMAND uniq OUTPUT_VARIABLE DIR)
+    string(REPLACE "\n" ";" DIR "${DIR}")
+    set(${OUTPUT} ${DIR} PARENT_SCOPE)
+endfunction(DIRNAME)
+
 # add source files to compile
 set(C_SOURCE_FILES "main.c")
 

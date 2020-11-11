@@ -11,12 +11,7 @@ set(TARGET_LIB_NAME w5500)
 
 # get sub directory
 file(GLOB_RECURSE CMAKELISTS "CMakeLists.txt")
-foreach(CMAKELIST ${CMAKELISTS})
-    execute_process(COMMAND dirname ${CMAKELIST} OUTPUT_VARIABLE CMAKELIST_DIR)
-    # delete '\n'
-    string(REGEX REPLACE "\n$" "" CMAKELIST_DIR "${CMAKELIST_DIR}")
-    set(CMAKELISTS_DIRS ${CMAKELISTS_DIRS} ${CMAKELIST_DIR})
-endforeach(CMAKELIST)
+dirname(CMAKELISTS CMAKELISTS_DIRS)
 
 # filter out current directory
 filter_out(CMAKE_CURRENT_SOURCE_DIR CMAKELISTS_DIRS CMAKELISTS_DIRS)
