@@ -16,7 +16,7 @@
             "interface": "jtag",
             "runToMain": true,
             "serialNumber": "",
-            "svdFile": "${workspaceRoot}\\svd\\STM32F103xx.svd"
+            "svdFile": "${workspaceRoot}/svd/STM32F103xx.svd"
         }
     ]
 }
