@@ -18,25 +18,22 @@
  */
 
 /*---------- includes ----------*/
+#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 #include "printk.h"
-#if !defined(PRINTK_LOCK_ENABLE) || PRINTK_LOCK_ENABLE > 0
-#include "config/os.h"
-#endif
+#include "config/options.h"
 
 #ifdef CONFIG_SYSLOG
-#include <time.h>
 #include "ff.h"
 #include "diskio.h"
 #include "pcf8563.h"
-#include "config/options.h"
 #include "config/attributes.h"
 #endif
 
 /*---------- marcos ----------*/
 #ifndef PRINTK_LOCK_ENABLE
-#define PRINTK_LOCK_ENABLE      (1)
+#define PRINTK_LOCK_ENABLE      (0)
 #endif
 
 #if PRINTK_LOCK_ENABLE
@@ -61,8 +58,11 @@
 /**
  * log buffer
  */
-#define CONFIG_LOG_BUF_SHIFT            (8)
-#define __LOG_BUF_LEN                   (1 << CONFIG_LOG_BUF_SHIFT)
+#ifndef CONFIG_PRINTK_LOG_BUF_SHIFT
+#define CONFIG_PRINTK_LOG_BUF_SHIFT     (10)
+#endif
+
+#define __LOG_BUF_LEN                   (1 << CONFIG_PRINTK_LOG_BUF_SHIFT)
 
 /**
  * printk's without a loglevel use this..
@@ -75,7 +75,10 @@
 #define LOG_BUF(index)      (log_buf[(index) & LOG_BUF_MASK])
 
 /*---------- variables ----------*/
-struct con console_driver;
+struct con {
+    unsigned int (*write)(const char *, unsigned int);
+    bool (*getc)(char *);
+};
 
 int console_printk[] = {
     DEFAULT_CONSOLE_LOGLEVEL,   /* console_loglevel */
@@ -84,6 +87,7 @@ int console_printk[] = {
 };
 
 #ifdef CONFIG_PRINTK
+static struct con console_driver;
 /**
  * The indices into log_buf are not constrained to log_buf_len - they
  * must be masked before subscripting
@@ -874,10 +878,11 @@ static void task_syslog(void *pvParameters)
  *
  * retval: true: console can use, false: console can not use
  */
-bool console_driver_init(void)
+bool console_driver_init(unsigned int (*write)(const char *, unsigned int))
 {
     bool retval = true;
 
+    console_driver.write = write;
 #if PRINTK_LOCK_ENABLE
     /**
      * use FreeRTOS as kernel os
@@ -902,6 +907,4 @@ bool console_driver_init(void)
 
     return retval;
 }
-
 #endif
-

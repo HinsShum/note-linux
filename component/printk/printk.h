@@ -80,7 +80,7 @@ static inline int printk(const char *fmt, ...)
     return 0;
 }
 
-static inline bool console_driver_init(void)
+static inline bool console_driver_init(unsigned int (*write)(const char *, unsigned int))
 {
     return true;
 }
@@ -113,14 +113,7 @@ static inline void printk_close_classficationlevel(void)
 #endif
 
 /*---------- type define ----------*/
-struct con {
-    unsigned int (*write)(const char *, unsigned int);
-    bool (*getc)(char *);
-};
-
-/* extern */
-extern struct con console_driver;
-extern bool console_driver_init(void);
+extern bool console_driver_init(unsigned int (*write)(const char *, unsigned int));
 extern int printk_get_loglevel(unsigned int log);
 extern void printk_set_loglevel(unsigned int log, unsigned int loglevel);
 extern unsigned short printk_get_classificationlevel(void);
