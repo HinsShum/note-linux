@@ -33,6 +33,8 @@
 #define IOCTL_SERIAL_GET_COMPORT                    (IOCTL_USER_START + 0x00)
 #define IOCTL_SERIAL_SET_IRQ_HANDLER                (IOCTL_USER_START + 0x01)
 #define IOCTL_SERIAL_DIRECTION_CHOOSE               (IOCTL_USER_START + 0x02)
+#define IOCTL_SERIAL_GET_BAUDRATE                   (IOCTL_USER_START + 0x03)
+#define IOCTL_SERIAL_SET_BAUDRATE                   (IOCTL_USER_START + 0x04)
 
 /*---------- type define ----------*/
 typedef enum {
@@ -43,6 +45,7 @@ typedef enum {
 
 typedef struct {
     uint8_t comport;
+    uint32_t baudrate;
     bool (*init)(void);
     void (*deinit)(void);
     void (*dir_change)(serial_direction_en dir);

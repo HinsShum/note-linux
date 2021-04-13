@@ -114,6 +114,25 @@ static int32_t serial_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
                 }
             }
             break;
+        case IOCTL_SERIAL_GET_BAUDRATE:
+            if(pdesc && args) {
+                *(uint32_t *)args = pdesc->baudrate;
+            }
+            break;
+        case IOCTL_SERIAL_SET_BAUDRATE:
+            if(pdesc && args) {
+                uint32_t baudrate = *(uint32_t *)args;
+                if(pdesc->baudrate != baudrate) {
+                    pdesc->baudrate = baudrate;
+                    if(pdesc->deinit) {
+                        pdesc->deinit();
+                    }
+                    if(pdesc->init) {
+                        retval = (pdesc->init() ? CY_EOK : CY_ERROR);
+                    }
+                }
+            }
+            break;
         default:
             retval = CY_E_WRONG_ARGS;
             break;

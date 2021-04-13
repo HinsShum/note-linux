@@ -81,8 +81,11 @@ static int32_t timer_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
             break;
         case IOCTL_TIMER_SET_INTERVAL:
             if(pdesc && pdesc->init && args) {
-                pdesc->interval_ms = *(uint32_t *)args;
-                pdesc->init();
+                uint32_t interval = *(uint32_t *)args;
+                if(pdesc->interval_ms != interval) {
+                    pdesc->interval_ms = interval;
+                    pdesc->init();
+                }
                 retval = CY_EOK;
             }
             break;
@@ -90,6 +93,16 @@ static int32_t timer_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
             if(pdesc && args) {
                 pdesc->irq_handler = (timer_irq_handler_fn)args;
                 retval = CY_EOK;
+            }
+            break;
+        case IOCTL_TIMER_ENABLE:
+            if(pdesc && pdesc->enable) {
+                retval = (pdesc->enable(true) ? CY_EOK : CY_ERROR);
+            }
+            break;
+        case IOCTL_TIMER_DISABLE:
+            if(pdesc && pdesc->enable) {
+                retval = (pdesc->enable(false) ? CY_EOK : CY_ERROR);
             }
             break;
         default:
