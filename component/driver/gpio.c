@@ -32,11 +32,12 @@
 static int32_t gpio_open(driver_t **pdrv);
 static void gpio_close(driver_t **pdrv);
 static int32_t gpio_ioctl(driver_t **pdrv, uint32_t cmd, void *args);
+static int32_t gpio_irq_handler(driver_t **pdrv, uint32_t irq_handler, void *args, uint32_t len);
 
 /*---------- function prototype ----------*/
 /*---------- type define ----------*/
 /*---------- variable ----------*/
-DRIVER_DEFINED(gpio, gpio_open, gpio_close, NULL, NULL, gpio_ioctl, NULL);
+DRIVER_DEFINED(gpio, gpio_open, gpio_close, NULL, NULL, gpio_ioctl, gpio_irq_handler);
 
 /*---------- function ----------*/
 static int32_t gpio_open(driver_t **pdrv)
@@ -91,9 +92,28 @@ static int32_t gpio_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
                 retval = CY_EOK;
             }
             break;
+        case IOCTL_GPIO_SET_IRQ_HANDLER:
+            if(pdesc) {
+                pdesc->irq_handler = (gpio_irq_handler_fn)args;
+            }
+            break;
         default:
             retval = CY_E_WRONG_ARGS;
             break;
+    }
+
+    return retval;
+}
+
+static int32_t gpio_irq_handler(driver_t **pdrv, uint32_t irq_handler, void *args, uint32_t len)
+{
+    gpio_describe_t *pdesc = NULL;
+    int32_t retval = CY_EOK;
+
+    assert(pdrv);
+    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    if(pdesc && pdesc->irq_handler) {
+        retval = pdesc->irq_handler(irq_handler, args, len);
     }
 
     return retval;

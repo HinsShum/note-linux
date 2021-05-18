@@ -33,14 +33,18 @@
 #define IOCTL_GPIO_GET                              (IOCTL_USER_START + 0x00)
 #define IOCTL_GPIO_SET                              (IOCTL_USER_START + 0x01)
 #define IOCTL_GPIO_TOGGLE                           (IOCTL_USER_START + 0x02)
+#define IOCTL_GPIO_SET_IRQ_HANDLER                  (IOCTL_USER_START + 0x03)
 
 /*---------- type define ----------*/
+typedef int32_t (*gpio_irq_handler_fn)(uint32_t, void *, uint32_t);
+
 typedef struct {
     bool (*init)(void);
     void (*deinit)(void);
     bool (*get)(void);
     void (*set)(bool val);
     void (*toggle)(void);
+    gpio_irq_handler_fn irq_handler;
 } gpio_describe_t;
 
 /*---------- variable prototype ----------*/
