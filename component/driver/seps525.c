@@ -172,29 +172,45 @@ static void __seps525_set_address(seps525_describe_t *pdesc, uint32_t x, uint32_
     __seps525_write_dat(pdesc, x);
     /* set col end address */
     __seps525_write_reg(pdesc, 0x18);
-    __seps525_write_dat(pdesc, width);
+    __seps525_write_dat(pdesc, x + width - 1);
     /* set row start address */
     __seps525_write_reg(pdesc, 0x19);
     __seps525_write_dat(pdesc, y);
     /* set row end address */
     __seps525_write_reg(pdesc, 0x1A);
-    __seps525_write_dat(pdesc, height);
+    __seps525_write_dat(pdesc, y + height - 1);
     /* start write */
     __seps525_write_reg(pdesc, 0x22);
 }
 
 static void __seps525_draw_pixel(seps525_describe_t *pdesc, uint32_t x, uint32_t y, uint32_t color)
 {
-    __seps525_set_address(pdesc, x, y, x, y);
+    __seps525_set_address(pdesc, x, y, 1, 1);
     pdesc->cs_ctrl(true);
     pdesc->xfer((color >> 8) & 0xFF);
     pdesc->xfer(color & 0xFF);
     pdesc->cs_ctrl(false);
 }
 
+static void __seps525_draw_rectangle(seps525_describe_t *pdesc, uint32_t x, uint32_t y, 
+                                     uint32_t width, uint32_t height, uint16_t *color)
+{
+    uint32_t size = width * height;
+
+    __seps525_set_address(pdesc, x, y, width, height);
+    pdesc->cs_ctrl(true);
+    for(uint32_t i = 0; i < size; ++i) {
+        pdesc->xfer((*color >> 8) & 0xFF);
+        pdesc->xfer(*color & 0xFF);
+        color++;
+    }
+
+    pdesc->cs_ctrl(false);
+}
+
 static void __seps525_refresh(seps525_describe_t *pdesc, uint32_t color)
 {
-    __seps525_set_address(pdesc, 0, 0, __WIDTH - 1, __HEIGHT - 1);
+    __seps525_set_address(pdesc, 0, 0, __WIDTH, __HEIGHT);
     pdesc->cs_ctrl(true);
     for(uint32_t i = 0; i < (__WIDTH * __HEIGHT); ++i) {
         pdesc->xfer((color >> 8) & 0xFF);
@@ -235,25 +251,32 @@ static int32_t seps525_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
 {
     seps525_describe_t *pdesc = NULL;
     int32_t retval = CY_ERROR;
-    seps525_ioctl_args_t *parg = NULL;
+    seps525_ioctl_args_un *parg = NULL;
 
     assert(pdrv);
     pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
     switch(cmd) {
         case IOCTL_SEPS525_DRAW_PIXEL:
             if(pdesc && args) {
-                parg = (seps525_ioctl_args_t *)args;
-                __seps525_draw_pixel(pdesc, parg->x, parg->y, parg->color);
+                parg = (seps525_ioctl_args_un *)args;
+                __seps525_draw_pixel(pdesc, parg->pixel.x, parg->pixel.y, parg->pixel.color);
                 retval = CY_EOK;
             }
             break;
         case IOCTL_SEPS525_SCREEN_CLEAR:
             if(pdesc && args) {
-                parg = (seps525_ioctl_args_t *)args;
-                __seps525_refresh(pdesc, parg->color);
+                parg = (seps525_ioctl_args_un *)args;
+                __seps525_refresh(pdesc, parg->pixel.color);
                 retval = CY_EOK;
             }
             break;
+        case IOCTL_SEPS525_DRAW_RECTANGLE:
+            if(pdesc && args) {
+                parg = (seps525_ioctl_args_un *)args;
+                __seps525_draw_rectangle(pdesc, parg->rectangle.x, parg->rectangle.y,
+                                         parg->rectangle.width, parg->rectangle.height, parg->rectangle.color);
+                retval = CY_EOK;
+            }
         default:
             retval = CY_E_WRONG_ARGS;
             break;

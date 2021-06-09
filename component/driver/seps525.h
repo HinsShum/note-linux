@@ -32,6 +32,7 @@
 /*---------- macro ----------*/
 #define IOCTL_SEPS525_DRAW_PIXEL                    (IOCTL_USER_START + 0x00)
 #define IOCTL_SEPS525_SCREEN_CLEAR                  (IOCTL_USER_START + 0x01)
+#define IOCTL_SEPS525_DRAW_RECTANGLE                (IOCTL_USER_START + 0x02)
 
 /* color
  */
@@ -48,11 +49,20 @@ typedef struct {
     void (*rs_ctrl)(bool ctrl);
 } seps525_describe_t;
 
-typedef struct {
-    uint32_t x;
-    uint32_t y;
-    uint32_t color;
-} seps525_ioctl_args_t;
+typedef union {
+    struct {
+        uint32_t x;
+        uint32_t y;
+        uint32_t color;
+    } pixel;
+    struct {
+        uint32_t x;
+        uint32_t y;
+        uint32_t width;
+        uint32_t height;
+        uint16_t *color;
+    } rectangle;
+} seps525_ioctl_args_un;
 
 /*---------- variable prototype ----------*/
 /*---------- function prototype ----------*/
