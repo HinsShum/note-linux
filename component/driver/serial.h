@@ -36,6 +36,11 @@
 #define IOCTL_SERIAL_GET_BAUDRATE                   (IOCTL_USER_START + 0x03)
 #define IOCTL_SERIAL_SET_BAUDRATE                   (IOCTL_USER_START + 0x04)
 
+/* Write automatically change dir flag 
+ */
+#define SERIAL_WIRTE_CHANGE_DIR_AUTOMATICALLY       (0x00)
+#define SERIAL_WIRTE_CHANGE_DIR_MANUAL              (0x01)
+
 /*---------- type define ----------*/
 typedef enum {
     SERIAL_DIRECTION_TX,

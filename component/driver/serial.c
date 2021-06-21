@@ -73,13 +73,13 @@ static int32_t serial_write(driver_t **pdrv, void *buf, uint32_t addition, uint3
 
     assert(pdrv);
     pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
-    if(pdesc && pdesc->dir_change) {
+    if(pdesc && pdesc->dir_change && addition == SERIAL_WIRTE_CHANGE_DIR_AUTOMATICALLY) {
         pdesc->dir_change(SERIAL_DIRECTION_TX);
     }
     if(pdesc && pdesc->write) {
         actual_len = pdesc->write((uint8_t *)buf, (uint16_t)len);
     }
-    if(pdesc && pdesc->dir_change) {
+    if(pdesc && pdesc->dir_change && addition == SERIAL_WIRTE_CHANGE_DIR_AUTOMATICALLY) {
         pdesc->dir_change(SERIAL_DIRECTION_RX);
     }
 
