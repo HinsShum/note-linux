@@ -43,8 +43,9 @@
 #define IOCTL_SILKID_DISCONNECT                     (IOCTL_USER_START + 0x06)
 #define IOCTL_SILKID_DELETE_ALL_TEMPLATE            (IOCTL_USER_START + 0x07)
 #define IOCTL_SILKID_DELETE_TEMPLATE                (IOCTL_USER_START + 0x08)
-#define IOCTL_SILKID_ENROLL_TEMPLATE                (IOCTL_USER_START + 0x09)
-#define IOCTL_SILKID_GET_ENROLL_NUMBERS             (IOCTL_USER_START + 0x0A)
+#define IOCTL_SILKID_DELETE_USER_TEMPLATE           (IOCTL_USER_START + 0x09)
+#define IOCTL_SILKID_ENROLL_TEMPLATE                (IOCTL_USER_START + 0x0A)
+#define IOCTL_SILKID_GET_ENROLL_NUMBERS             (IOCTL_USER_START + 0x0B)
 
 /*---------- type define ----------*/
 typedef enum {

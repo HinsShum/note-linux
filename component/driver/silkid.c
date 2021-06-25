@@ -142,7 +142,7 @@ typedef struct {
     uint8_t end;
 } __attribute__((aligned(1))) silkid_general_packet_t;
 
-typedef silkid_general_packet_t slikid_response_packet_t;
+typedef silkid_general_packet_t silkid_response_packet_t;
 
 /*---------- variable ----------*/
 DRIVER_DEFINED(silkid, silkid_open, silkid_close, NULL, NULL, silkid_ioctl, silkid_irq_handler);
@@ -245,7 +245,7 @@ static void __silkid_make_general_packet(silkid_describe_t *pdesc, silkid_comman
 static int32_t silkid_connect(silkid_describe_t *pdesc)
 {
     int32_t retval = CY_ERROR;
-    slikid_response_packet_t *pack = (slikid_response_packet_t *)pdesc->normal.buf;
+    silkid_response_packet_t *pack = (silkid_response_packet_t *)pdesc->normal.buf;
     uint32_t timeoutms = 100;
 
     __silkid_make_general_packet(pdesc, SILKID_CMD_MD_SYS_STATUS, 0, 0, 0);
@@ -269,7 +269,7 @@ static int32_t silkid_connect(silkid_describe_t *pdesc)
 static int32_t silkid_disconnect(silkid_describe_t *pdesc)
 {
     int32_t retval = CY_ERROR;
-    slikid_response_packet_t *pack = (slikid_response_packet_t *)pdesc->normal.buf;
+    silkid_response_packet_t *pack = (silkid_response_packet_t *)pdesc->normal.buf;
     uint32_t timeoutms = 100;
 
     __silkid_make_general_packet(pdesc, SILKID_CMD_MD_DISCONNECT, 0, 0, 0);
@@ -304,10 +304,34 @@ static int32_t silkid_delete_all_user_template(silkid_describe_t *pdesc)
 static int32_t silkid_delete_template(silkid_describe_t *pdesc, uint32_t id)
 {
     int32_t retval = CY_ERROR;
-    slikid_response_packet_t *pack = (slikid_response_packet_t *)pdesc->normal.buf;
+    silkid_response_packet_t *pack = (silkid_response_packet_t *)pdesc->normal.buf;
     uint32_t timeoutms = 200;
 
     __silkid_make_general_packet(pdesc, SILKID_CMD_MD_DEL_TMP, id, 0, 0x77);
+    __silkid_write(pdesc);
+    while(timeoutms-- > 0) {
+        if(SILKID_RECV_STATUS_BUSY == pdesc->normal.status) {
+            break;
+        }
+        __delay_ms(1);
+    }
+    if(SILKID_RECV_STATUS_BUSY != pdesc->normal.status) {
+        retval = CY_E_TIME_OUT;
+    } else if(SILKID_FLAG_SUCCESS == pack->flag) {
+        retval = CY_EOK;
+    }
+    __silkid_reset_normal_buffer(pdesc);
+
+    return retval;
+}
+
+static int32_t silkid_delete_user_template(silkid_describe_t *pdesc, uint32_t id)
+{
+    int32_t retval = CY_EOK;
+    silkid_response_packet_t *pack = (silkid_response_packet_t *)pdesc->normal.buf;
+    uint32_t timeoutms = 200;
+
+    __silkid_make_general_packet(pdesc, SILKID_CMD_MD_DEL_TMP, id, 0, 0x00);
     __silkid_write(pdesc);
     while(timeoutms-- > 0) {
         if(SILKID_RECV_STATUS_BUSY == pdesc->normal.status) {
@@ -330,7 +354,7 @@ static int32_t silkid_enroll_template(silkid_describe_t *pdesc, silkid_enroll_te
     int32_t retval = CY_ERROR;
     uint16_t finger_id = (enroll->id >> 16) & 0xFFFF;
     uint16_t user_id = enroll->id & 0xFFFF;
-    slikid_response_packet_t *pack = (slikid_response_packet_t *)pdesc->normal.buf;
+    silkid_response_packet_t *pack = (silkid_response_packet_t *)pdesc->normal.buf;
     uint32_t size = 0, timeoutms = 200;
 
     enroll->result = SILKID_ENROLL_RESULT_FAILE;
@@ -370,7 +394,7 @@ static int32_t silkid_enroll_template(silkid_describe_t *pdesc, silkid_enroll_te
 static int32_t silkid_get_enroll_numbers(silkid_describe_t *pdesc, uint32_t *numbers)
 {
     int32_t retval = CY_ERROR;
-    slikid_response_packet_t *pack = (slikid_response_packet_t *)pdesc->normal.buf;
+    silkid_response_packet_t *pack = (silkid_response_packet_t *)pdesc->normal.buf;
     uint32_t timeoutms = 100;
 
     __silkid_make_general_packet(pdesc, SILKID_CMD_MD_SYS_RP, 0, 0, SILKID_SYS_PARA_FINGERPRINT_NUMBERS);
@@ -459,6 +483,11 @@ static int32_t silkid_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
                 retval = silkid_delete_template(pdesc, *(uint32_t *)args);
             }
             break;
+        case IOCTL_SILKID_DELETE_USER_TEMPLATE:
+            if(pdesc && args) {
+                retval = silkid_delete_user_template(pdesc, *(uint32_t *)args);
+            }
+            break;
         case IOCTL_SILKID_ENROLL_TEMPLATE:
             if(pdesc && args) {
                 retval = silkid_enroll_template(pdesc, args);
@@ -481,7 +510,7 @@ static int32_t silkid_irq_recv_pack(silkid_describe_t *pdesc, uint8_t ch)
 {
     int32_t retval = CY_EOK;
     uint32_t sum = 0;
-    slikid_response_packet_t *pack = (slikid_response_packet_t *)pdesc->normal.buf;
+    silkid_response_packet_t *pack = (silkid_response_packet_t *)pdesc->normal.buf;
 
     do {
         if(SILKID_RECV_STATUS_BUSY == pdesc->normal.status) {
@@ -506,7 +535,7 @@ static int32_t silkid_irq_recv_pack(silkid_describe_t *pdesc, uint8_t ch)
             }
             /* check sum */
             if(pack->checksum != (__silkid_checksum((uint8_t *)pack, 
-                                  offsetof(slikid_response_packet_t, checksum)) & 0xFF)) {
+                                  offsetof(silkid_response_packet_t, checksum)) & 0xFF)) {
                 retval = CY_E_WRONG_CRC;
                 break;
             }
@@ -525,7 +554,7 @@ static int32_t silkid_irq_handler(driver_t **pdrv, uint32_t irq_handler, void *a
     silkid_describe_t *pdesc = NULL;
     int32_t retval = CY_EOK;
     uint8_t *pdata = (uint8_t *)args;
-    slikid_response_packet_t *pack = NULL;
+    silkid_response_packet_t *pack = NULL;
     silkid_irq_handler_args_t irq_args = {
         .id = 0,
         .msg = SILKID_MESSAGE_NONE
@@ -534,7 +563,7 @@ static int32_t silkid_irq_handler(driver_t **pdrv, uint32_t irq_handler, void *a
     assert(pdrv);
     assert(args || !len);
     pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
-    pack = (slikid_response_packet_t *)pdesc->normal.buf;
+    pack = (silkid_response_packet_t *)pdesc->normal.buf;
     while(len-- > 0) {
         silkid_irq_recv_pack(pdesc, *pdata++);
     }
