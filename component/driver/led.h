@@ -31,17 +31,25 @@
 #define IOCTL_LED_ON                        (IOCTL_USER_START + 0x00)
 #define IOCTL_LED_OFF                       (IOCTL_USER_START + 0x01)
 #define IOCTL_LED_TOGGLE                    (IOCTL_USER_START + 0x02)
-#define IOCTL_LED_SET_BLINK_TIME            (IOCTL_USER_START + 0x03)
-#define IOCTL_LED_GET_BLINK_TIME            (IOCTL_USER_START + 0x04)
+#define IOCTL_LED_SET_CYCLE                 (IOCTL_USER_START + 0x03)
+#define IOCTL_LED_GET_CYCLE                 (IOCTL_USER_START + 0x04)
+
+#define LED_CYCLE_COUNT_MAX                 (0xFFFFFFFF)
 
 /*---------- type define ----------*/
 typedef struct {
-    uint32_t blink_time; //! unit=ms
+    uint32_t cycle_time;
+    uint32_t cycle_count;
     void (*init)(void);
     void (*deinit)(void);
     void (*ctrl)(bool on);
     void (*toggle)(void);
 } led_describe_t;
+
+typedef struct {
+    uint32_t cycle_time;
+    uint32_t cycle_count;
+} led_cycle_t;
 
 /*---------- variable prototype ----------*/
 /*---------- function prototype ----------*/

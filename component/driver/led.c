@@ -66,6 +66,7 @@ static int32_t led_ioctl(driver_t **pdrv, uint32_t cmd, void *arg)
 {
     led_describe_t *pdesc = NULL;
     int32_t retval = CY_EOK;
+    led_cycle_t *cycle = NULL;
 
     assert(pdrv);
 
@@ -84,16 +85,23 @@ static int32_t led_ioctl(driver_t **pdrv, uint32_t cmd, void *arg)
         case IOCTL_LED_TOGGLE:
             if(pdesc->toggle) {
                 pdesc->toggle();
+                if(pdesc->cycle_count != 0 && pdesc->cycle_count != LED_CYCLE_COUNT_MAX) {
+                    pdesc->cycle_count--;
+                }
             }
             break;
-        case IOCTL_LED_SET_BLINK_TIME:
+        case IOCTL_LED_SET_CYCLE:
             if(arg) {
-                pdesc->blink_time = *(uint32_t *)arg;
+                cycle = (led_cycle_t *)arg;
+                pdesc->cycle_time = cycle->cycle_time;
+                pdesc->cycle_count = cycle->cycle_count;
             }
             break;
-        case IOCTL_LED_GET_BLINK_TIME:
+        case IOCTL_LED_GET_CYCLE:
             if(arg) {
-                *(uint32_t *)arg = pdesc->blink_time;
+                cycle = (led_cycle_t *)arg;
+                cycle->cycle_time = pdesc->cycle_time;
+                cycle->cycle_count = pdesc->cycle_count;
             }
             break;
         default:
