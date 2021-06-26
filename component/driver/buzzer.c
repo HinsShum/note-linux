@@ -68,6 +68,7 @@ static int32_t buzzer_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
 {
     buzzer_describe_t *pdesc = NULL;
     int32_t retval = CY_EOK;
+    buzzer_cycle_t *cycle = NULL;
 
     assert(pdrv);
     pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
@@ -85,16 +86,23 @@ static int32_t buzzer_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
         case IOCTL_BUZZER_TOGGLE:
             if(pdesc && pdesc->toggle) {
                 pdesc->toggle();
+                if(pdesc->cycle_count != 0 && pdesc->cycle_count != BUZZER_CYCLE_COUNT_MAX) {
+                    pdesc->cycle_count--;
+                }
             }
             break;
-        case IOCTL_BUZZER_SET_TOGGLE_TIME:
+        case IOCTL_BUZZER_SET_CYCLE:
             if(pdesc && args) {
-                pdesc->toggle_time = *(uint32_t *)args;
+                cycle = (buzzer_cycle_t *)args;
+                pdesc->cycle_time = cycle->cycle_time;
+                pdesc->cycle_count = cycle->cycle_count;
             }
             break;
-        case IOCTL_BUZZER_GET_TOGGLE_TIME:
+        case IOCTL_BUZZER_GET_CYCLE:
             if(pdesc && args) {
-                *(uint32_t *)args = pdesc->toggle_time;
+                cycle = (buzzer_cycle_t *)args;
+                cycle->cycle_time = pdesc->cycle_time;
+                cycle->cycle_count = pdesc->cycle_count;
             }
             break;
         default:
