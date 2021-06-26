@@ -80,6 +80,8 @@ static int32_t led_ioctl(driver_t **pdrv, uint32_t cmd, void *arg)
         case IOCTL_LED_OFF:
             if(pdesc->ctrl) {
                 pdesc->ctrl(false);
+                pdesc->cycle_count = 0;
+                pdesc->cycle_time = 0;
             }
             break;
         case IOCTL_LED_TOGGLE:
