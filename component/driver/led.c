@@ -47,6 +47,9 @@ static int32_t led_open(driver_t **pdrv)
     if(pdesc && pdesc->init) {
         pdesc->init();
     }
+    if(pdesc && pdesc->ctrl) {
+        pdesc->ctrl(false);
+    }
 
     return retval;
 }
@@ -59,6 +62,9 @@ static void led_close(driver_t **pdrv)
     pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->deinit) {
         pdesc->deinit();
+    }
+    if(pdesc && pdesc->ctrl) {
+        pdesc->ctrl(false);
     }
 }
 
@@ -104,6 +110,11 @@ static int32_t led_ioctl(driver_t **pdrv, uint32_t cmd, void *arg)
                 cycle = (led_cycle_t *)arg;
                 cycle->cycle_time = pdesc->cycle_time;
                 cycle->cycle_count = pdesc->cycle_count;
+            }
+            break;
+        case IOCTL_LED_GET_STATUS:
+            if(arg && pdesc && pdesc->get) {
+                *(bool *)arg = pdesc->get();
             }
             break;
         default:

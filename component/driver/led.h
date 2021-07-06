@@ -33,6 +33,7 @@
 #define IOCTL_LED_TOGGLE                    (IOCTL_USER_START + 0x02)
 #define IOCTL_LED_SET_CYCLE                 (IOCTL_USER_START + 0x03)
 #define IOCTL_LED_GET_CYCLE                 (IOCTL_USER_START + 0x04)
+#define IOCTL_LED_GET_STATUS                (IOCTL_USER_START + 0x05)
 
 #define LED_CYCLE_COUNT_MAX                 (0xFFFFFFFF)
 
@@ -44,6 +45,7 @@ typedef struct {
     void (*deinit)(void);
     void (*ctrl)(bool on);
     void (*toggle)(void);
+    bool (*get)(void);
 } led_describe_t;
 
 typedef struct {
