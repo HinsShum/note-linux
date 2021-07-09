@@ -23,6 +23,11 @@
 #ifndef __MOTORCOMM_YT8512X_H
 #define __MOTORCOMM_YT8512X_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /*---------- includes ----------*/
 #include <stdint.h>
 #include <stdbool.h>
@@ -85,4 +90,8 @@ typedef struct {
 
 /*---------- variable prototype ----------*/
 /*---------- function prototype ----------*/
+
+#ifdef __cplusplus
+}
+#endif
 #endif /* __MOTORCOMM_YT8512X_H */

@@ -23,6 +23,11 @@
 #ifndef __SERIAL_H
 #define __SERIAL_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /*---------- includes ----------*/
 #include <stdint.h>
 #include <stdbool.h>
@@ -60,4 +65,8 @@ typedef struct {
 
 /*---------- variable prototype ----------*/
 /*---------- function prototype ----------*/
+
+#ifdef __cplusplus
+}
+#endif
 #endif /* __SERIAL_H */

@@ -23,6 +23,11 @@
 #ifndef __DRIVER_H
 #define __DRIVER_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /*---------- includes ----------*/
 #include <stdint.h>
 #include <stdbool.h>
@@ -58,4 +63,7 @@ typedef struct st_driver {
 /*---------- function prototype ----------*/
 extern int32_t driver_search_device(void);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* __DRIVER_H */

@@ -23,6 +23,11 @@
 #ifndef __DRIVER_TIMER_H
 #define __DRIVER_TIMER_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /*---------- includes ----------*/
 #include <stdint.h>
 #include <stdbool.h>
@@ -49,4 +54,8 @@ typedef struct {
 
 /*---------- variable prototype ----------*/
 /*---------- function prototype ----------*/
+
+#ifdef __cplusplus
+}
+#endif
 #endif /* __DRIVER_TIMER_H */

@@ -23,6 +23,11 @@
 #ifndef __DRIVER_SEPS525_H
 #define __DRIVER_SEPS525_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /*---------- includes ----------*/
 #include <stdint.h>
 #include <stdbool.h>
@@ -66,4 +71,8 @@ typedef union {
 
 /*---------- variable prototype ----------*/
 /*---------- function prototype ----------*/
+
+#ifdef __cplusplus
+}
+#endif
 #endif /* __DRIVER_SEPS525_H */

@@ -21,6 +21,11 @@
 #ifndef __DEVICE_H
 #define __DEVICE_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /*---------- includes ----------*/
 #include <stdint.h>
 #include <stdbool.h>
@@ -74,4 +79,7 @@ extern int32_t device_read(device_t *dev, void *buf, uint32_t addition, uint32_t
 extern int32_t device_ioctl(device_t *dev, uint32_t cmd, void *args);
 extern int32_t device_irq_process(device_t *dev, uint32_t irq_handler, void *args, uint32_t len);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* __DEVICE_H */
