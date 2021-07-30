@@ -649,7 +649,7 @@ static int32_t ms523_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
             break;
         case IOCTL_MS523_PCD_REQUEST_IDLE:
             if(pdesc && args) {
-                retval = ms523_pcd_request(pdesc, MS523_PCD_REQUEST_IDLE, args);
+                retval = ms523_pcd_request(pdesc, MS523_PCD_REQUEST_IDLE, (uint8_t **)args);
             }
             break;
         case IOCTL_MS523_PCD_REQUEST_ALL:
