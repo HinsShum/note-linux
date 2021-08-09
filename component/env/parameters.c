@@ -166,8 +166,9 @@ bool parameters_save(struct st_para_info *pinfo, void *new)
     /* look for a location to store the new parameter block
      */
     while(true) {
-        if((offset & (pinfo->erase_block_size - 1)) == 0) {
-            pinfo->erase(offset);    /* into new block */
+        if(pinfo->check_address(offset)) {
+            /* offset is the block first address */
+            pinfo->erase(offset);
         }
 #if defined(FLASH_TYPE_ZERO)
         for(index = 0; index < pinfo->para_size; ++index) {

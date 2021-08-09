@@ -43,6 +43,8 @@ struct st_para_info {
     uint32_t (*read)(uint32_t address, void *data, uint32_t len);
     /* flash erase interface, erase signal block */
     bool (*erase)(uint32_t address);
+    /* flash check if the address is the first address of the block */
+    bool (*check_address)(uint32_t address);
 };
 
 /*---------- variable prototype ----------*/
