@@ -153,7 +153,7 @@ static int32_t _ioctl_flash_erase_block(flash_describe_t *pdesc, void *args)
             break;
         }
         retval = (int32_t)erase_length;
-        __debug_message("Erase block size: %dbytes\n", erase_length);
+        __debug_message("Erase address(%08X) block size: %dbytes\n", *paddr, erase_length);
     } while(0);
 
     return retval;
