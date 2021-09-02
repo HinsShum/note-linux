@@ -113,25 +113,33 @@ static const uint16_t crc_1021_table[256] = {
 
 /*---------- function ----------*/
 #if CONFIG_CHECKSUM_CRC16_MODBUS_CACULATE
+/**
+ * CRC16-MODBUS:
+ *  width: 16
+ *  poly: 0x8005 (X16+X15+X2+1)
+ *  init: 0xFFFF
+ *  refin: true
+ *  refout: true
+ *  xorout: 0x00
+ */
 uint16_t checksum_crc16_modbus(void *data, uint16_t len)
 {
-    uint8_t *pdata = (uint8_t *)data;
-    uint16_t crc = 0xFFFF;
-    uint16_t i = 0, j = 0;
-    for(j = 0; j < len; j++) {
-        crc = crc ^ *pdata;
-        pdata++;
-        for(i = 0; i < 8; i++) {
-            if((crc & 0x0001) > 0) {
-                crc = crc >> 1;
-                crc = crc ^ 0xA001;
+    uint16_t crc = 0xFFFF, poly = 0xA001;
+    uint8_t *byte = (uint8_t *)data;
+
+    while(len--) {
+        crc ^= *byte++;
+        for(uint8_t i = 0; i < 8; ++i) {
+            if(crc & 0x0001) {
+                crc >>= 1;
+                crc ^= poly;
             } else {
-                crc = crc >> 1;
+                crc >>= 1;
             }
         }
     }
 
-    return (crc);
+    return crc;
 }
 #else
 uint16_t checksum_crc16_modbus(void *data, uint16_t len)
@@ -152,28 +160,34 @@ uint16_t checksum_crc16_modbus(void *data, uint16_t len)
 #endif
 
 #if CONFIG_CHECKSUM_CRC16_XMODEM_CACULATE
+/**
+ * CRC16-XMODE:
+ *  width: 16
+ *  poly: 0x1021 (X16+X12+X5+1)
+ *  init: 0x00
+ *  refin: false
+ *  refout: false
+ *  xorout: 0x00
+ */
 uint16_t checksum_crc16_xmodem(void *data, uint16_t len)
 {
-	uint8_t *ptr = (uint8_t *)data;
-    uint8_t i = 0;
-    uint16_t crc = 0;
+    uint16_t crc = 0x00, poly = 0x1021;
+    uint8_t *byte = (uint8_t *)data;
 
-    while(len-- != 0) {
-        for(i = 0x80; i != 0; i /= 2) {
-            if((crc & 0x8000) != 0) {
-                crc *= 2; 
-                crc ^= 0x1021;
-            } else { 
-                crc *= 2;
-            }
-            if((*ptr & i) != 0) {
-                crc ^= 0x1021;
+    while(len--) {
+        crc ^= ((uint16_t)*byte << 8);
+        byte++;
+        for(uint8_t i = 0; i < 8; ++i) {
+            if(crc & 0x8000) {
+                crc <<= 1;
+                crc ^= poly;
+            } else {
+                crc <<= 1;
             }
         }
-        ptr++;
     }
 
-    return(crc);
+    return crc;
 }
 #else
 uint16_t checksum_crc16_xmodem(void *data, uint16_t len)
@@ -228,4 +242,178 @@ uint16_t checksum_sum16(void *data, uint16_t len)
     }
 
     return sum;
+}
+
+/**
+ * CRC8:
+ *  width: 8
+ *  poly: 0x07 (X8+X2+X+1)
+ *  init: 0x00
+ *  refin: false
+ *  refout: false
+ *  xorout: 0x00
+ */
+uint8_t checksum_crc8(void *data, uint16_t len)
+{
+    uint8_t poly = 0x07, crc = 0x00;
+    uint8_t *byte = (uint8_t *)data;
+
+    while(len--) {
+        crc ^= *byte++;
+        for(uint8_t i = 0; i < 8; ++i) {
+            if(crc & 0x80) {
+                crc <<= 1;
+                crc ^= poly;
+            } else {
+                crc <<= 1;
+            }
+        }
+    }
+
+    return crc;
+}
+
+/**
+ * CRC8-ROHC:
+ *  width: 8
+ *  poly: 0x07 (X8+X2+X+1)
+ *  init: 0xFF
+ *  refin: true
+ *  refout: true
+ *  xorout: 0x00
+ */
+uint8_t checksum_crc8_rohc(void *data, uint16_t len)
+{
+    uint8_t crc = 0xFF, poly = 0xE0;
+    uint8_t *byte = (uint8_t *)data;
+
+    while(len--) {
+        crc ^= *byte++;
+        for(uint8_t i = 0; i < 8; ++i) {
+            if(crc & 0x01) {
+                crc >>= 1;
+                crc ^= poly;
+            } else {
+                crc >>= 1;
+            }
+        }
+    }
+
+    return crc;
+}
+
+/**
+ * CRC8-ITU:
+ *  width: 8
+ *  poly: 0x07 (X8+X2+X+1)
+ *  init: 0x00
+ *  refin: false
+ *  refout: false
+ *  xorout: 0x55
+ */
+uint8_t checksum_crc8_itu(void *data, uint16_t len)
+{
+    uint8_t poly = 0x07, crc = 0x00;
+    uint8_t *byte = (uint8_t *)data;
+
+    while(len--) {
+        crc ^= *byte++;
+        for(uint8_t i = 0; i < 8; ++i) {
+            if(crc & 0x80) {
+                crc <<= 1;
+                crc ^= poly;
+            } else {
+                crc <<= 1;
+            }
+        }
+    }
+
+    return (crc ^ 0x55);
+}
+
+/**
+ * CRC8-MAXIM:
+ *  width: 8
+ *  poly: 0x31 (X8+X5+X4+1)
+ *  init: 0x00
+ *  refin: true
+ *  refout: true
+ *  xorout: 0x00
+ */
+uint8_t checksum_crc8_maxim(void *data, uint16_t len)
+{
+    uint8_t crc = 0x00, poly = 0x8C;
+    uint8_t *byte = (uint8_t *)data;
+
+    while(len--) {
+        crc ^= *byte++;
+        for(uint8_t i = 0; i < 8; ++i) {
+            if(crc & 0x01) {
+                crc >>= 1;
+                crc ^= poly;
+            } else {
+                crc >>= 1;
+            }
+        }
+    }
+
+    return crc;
+}
+
+/**
+ * CRC8-CCITT:
+ *  width: 8
+ *  poly: 0x8D (X8+X7+X3+X2+1)
+ *  init: 0x00
+ *  refin: true
+ *  refout: true
+ *  xorout: 0x00
+ */
+uint8_t checksum_crc8_ccitt(void *data, uint16_t len)
+{
+    uint8_t crc = 0x00, poly = 0xB1;
+    uint8_t *byte = (uint8_t *)data;
+
+    while(len--) {
+        crc ^= *byte++;
+        for(uint8_t i = 0; i < 8; ++i) {
+            if(crc & 0x01) {
+                crc >>= 1;
+                crc ^= poly;
+            } else {
+                crc >>= 1;
+            }
+        }
+    }
+
+    return crc;
+}
+
+/**
+ * CRC16-CCITT:
+ *  width: 16
+ *  poly: 0x1021 (X16+X12+X5+1)
+ *  init: 0x00
+ *  refin: true
+ *  refout: true
+ *  xorout: 0x00
+ */
+uint16_t checksum_crc16_ccitt(void *data, uint16_t len)
+{
+    uint16_t crc = 0x00, poly = 0x8408;
+    uint8_t *byte = (uint8_t *)data;
+
+    while(len--) {
+        crc ^= *byte++;
+        for(uint8_t i = 0; i < 8; ++i) {
+            if(crc & 0x0001) {
+                crc >>= 1;
+                crc ^= poly;
+            } else {
+                crc >>= 1;
+            }
+        }
+    }
+
+    return crc;
 }
