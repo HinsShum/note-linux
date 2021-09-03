@@ -89,7 +89,7 @@ static bool _i2c_bus_start(i2c_bus_describe_t *pdesc)
         pdesc->ops.scl_set(false);
         retval = true;
     } else {
-        __debug_error("I2C bus detect the SDA signal is high when i2c bus start\n");
+        __debug_error("I2C bus detect the SDA signal is not high when i2c bus start\n");
     }
 
     return retval;
@@ -232,15 +232,14 @@ static int32_t __i2c_bus_write_memory_address(i2c_bus_describe_t *pdesc, i2c_bus
     int32_t retval = CY_ERROR;
 
     do {
-        if(!pmsg->mem_addr) {
-            __debug_error("I2C bus not specify the memory address\n");
-            break;
-        }
         if(true != _i2c_bus_send_address(pdesc, pmsg->dev_addr & 0xFE)) {
             __debug_error("Send i2c bus address(%02X) failed\n", pmsg->dev_addr);
             break;
         }
         retval = CY_EOK;
+        if(!pmsg->mem_addr) {
+            break;
+        }
         /* send memory address */
         for(uint32_t i = 0; i < pmsg->mem_addr_counts; ++i) {
             if(true != _i2c_bus_write_byte(pdesc, pmsg->mem_addr[i])) {
@@ -294,6 +293,7 @@ static int32_t _i2c_bus_sequential_read_bytes(i2c_bus_describe_t *pdesc, i2c_bus
             __debug_error("Send i2c bus address(%02X) failed\n", pmsg->dev_addr);
             break;
         }
+        retval = CY_EOK;
         while(length > 0) {
             --length;
             *pbuf++ = _i2c_bus_read_byte(pdesc);
@@ -319,7 +319,7 @@ static int32_t _i2c_bus_write_bytes(i2c_bus_describe_t *pdesc, i2c_bus_msg_t *pm
         retval = CY_ERROR;
         while(length > 0) {
             if(true != _i2c_bus_write_byte(pdesc, *pbuf++)) {
-                __debug_error("I2C bus write data failed\n");
+                __debug_error("I2C bus write data failed, not get the right ack\n");
                 break;
             }
             --length;

@@ -41,6 +41,7 @@ static int32_t at24cxx_ioctl(driver_t **pdrv, uint32_t cmd, void *args);
 /* private ioctl functions
  */
 static int32_t _ioctl_erase_block(at24cxx_describe_t *pdesc, void *args);
+static int32_t _ioctl_erase_chip(at24cxx_describe_t *pdesc, void *args);
 static int32_t _ioctl_check_addr_is_block_start(at24cxx_describe_t *pdesc, void *args);
 static int32_t _ioctl_get_info(at24cxx_describe_t *pdesc, void *args);
 static int32_t _ioctl_set_callback(at24cxx_describe_t *pdesc, void *args);
@@ -57,7 +58,7 @@ DRIVER_DEFINED(at24cxx, at24cxx_open, at24cxx_close, at24cxx_write, at24cxx_read
 
 static ioctl_cb_t ioctl_cb_array[] = {
     {IOCTL_FLASH_ERASE_BLOCK, _ioctl_erase_block},
-    {IOCTL_FLASH_ERASE_CHIP, NULL},
+    {IOCTL_FLASH_ERASE_CHIP, _ioctl_erase_chip},
     {IOCTL_FLASH_CHECK_ADDR_IS_BLOCK_START, _ioctl_check_addr_is_block_start},
     {IOCTL_FLASH_GET_INFO, _ioctl_get_info},
     {IOCTL_FLASH_SET_CALLBACK, _ioctl_set_callback}
@@ -251,7 +252,6 @@ static int32_t _ioctl_erase_block(at24cxx_describe_t *pdesc, void *args)
     int32_t retval = CY_E_WRONG_ARGS;
     uint32_t *poffset = (uint32_t *)args;
     uint32_t addr = 0;
-    uint32_t erase_length = 0;
     uint8_t buf[64] = {0};
     i2c_bus_msg_t msg = {0};
     uint8_t memory_addr[2] = {0};
@@ -262,7 +262,7 @@ static int32_t _ioctl_erase_block(at24cxx_describe_t *pdesc, void *args)
             break;
         }
         memset(buf, 0xFF, sizeof(buf));
-        addr = ((*poffset + pdesc->info.start) % pdesc->info.block_size) * pdesc->info.block_size;
+        addr = ((*poffset + pdesc->info.start) / pdesc->info.block_size) * pdesc->info.block_size;
         if(pdesc->mem_addr_counts == 1) {
             memory_addr[0] = addr & 0xFF;
         } else {
@@ -287,10 +287,56 @@ static int32_t _ioctl_erase_block(at24cxx_describe_t *pdesc, void *args)
             break;
         }
         retval = (int32_t)pdesc->info.block_size;
-        __debug_message("Erase address(%08X) block size: %dbytes\n", addr, pdesc->info.block_size);
+        __debug_info("Erase address(%08X) block size: %dbytes\n", addr, pdesc->info.block_size);
     } while(0);
     if(pdesc->ops.write_protect_set) {
         pdesc->ops.write_protect_set(true);
+    }
+
+    return retval;
+}
+
+static int32_t _ioctl_erase_chip(at24cxx_describe_t *pdesc, void *args)
+{
+    uint32_t addr = pdesc->info.start;
+    int32_t retval = CY_ERROR;
+    uint8_t buf[64] = {0};
+    i2c_bus_msg_t msg = {0};
+    uint8_t memory_addr[2] = {0};
+
+    if(pdesc->ops.write_protect_set) {
+        pdesc->ops.write_protect_set(false);
+    }
+    memset(buf, 0xFF, ARRAY_SIZE(buf));
+    while(addr < pdesc->info.end) {
+        if(pdesc->mem_addr_counts == 1) {
+            memory_addr[0] = addr & 0xFF;
+        } else {
+            memory_addr[0] = (addr >> 8) & 0xFF;
+            memory_addr[1] = addr & 0xFF;
+        }
+        msg.type = I2C_BUS_TYPE_WRITE;
+        msg.dev_addr = pdesc->address;
+        msg.mem_addr = memory_addr;
+        msg.mem_addr_counts = pdesc->mem_addr_counts;
+        msg.buf = buf;
+        msg.len = pdesc->info.block_size;
+        device_ioctl(pdesc->bus, IOCTL_I2C_BUS_LOCK, NULL);
+        retval = device_write(pdesc->bus, &msg, 0, sizeof(msg));
+        device_ioctl(pdesc->bus, IOCTL_I2C_BUS_UNLOCK, NULL);
+        _do_callback(pdesc);
+        if(CY_EOK != retval) {
+            __debug_error("AT24CXX erase chip failed, %08X address occur error\n", addr);
+            break;
+        }
+        __debug_info("Erase chip, current address: %08X\n", addr);
+        addr += msg.len;
+    }
+    if(pdesc->ops.write_protect_set) {
+        pdesc->ops.write_protect_set(true);
+    }
+    if(addr >= pdesc->info.end) {
+        retval = (int32_t)(pdesc->info.end - pdesc->info.start);
     }
 
     return retval;
