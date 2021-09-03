@@ -361,35 +361,6 @@ uint8_t checksum_crc8_maxim(void *data, uint16_t len)
 }
 
 /**
- * CRC8-CCITT:
- *  width: 8
- *  poly: 0x8D (X8+X7+X3+X2+1)
- *  init: 0x00
- *  refin: true
- *  refout: true
- *  xorout: 0x00
- */
-uint8_t checksum_crc8_ccitt(void *data, uint16_t len)
-{
-    uint8_t crc = 0x00, poly = 0xB1;
-    uint8_t *byte = (uint8_t *)data;
-
-    while(len--) {
-        crc ^= *byte++;
-        for(uint8_t i = 0; i < 8; ++i) {
-            if(crc & 0x01) {
-                crc >>= 1;
-                crc ^= poly;
-            } else {
-                crc >>= 1;
-            }
-        }
-    }
-
-    return crc;
-}
-
-/**
  * CRC16-CCITT:
  *  width: 16
  *  poly: 0x1021 (X16+X12+X5+1)

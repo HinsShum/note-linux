@@ -42,7 +42,6 @@ extern uint8_t checksum_crc8_rohc(void *data, uint16_t len);
 extern uint8_t checksum_crc8_rohc(void *data, uint16_t len);
 extern uint8_t checksum_crc8_itu(void *data, uint16_t len);
 extern uint8_t checksum_crc8_maxim(void *data, uint16_t len);
-extern uint8_t checksum_crc8_ccitt(void *data, uint16_t len);
 extern uint16_t checksum_crc16_fm13dt160(void *data, uint16_t len);
 extern uint16_t checksum_crc16_ccitt(void *data, uint16_t len);
 
