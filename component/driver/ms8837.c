@@ -96,6 +96,26 @@ static int32_t ms8837_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
                 retval = (pdesc->ctrl(CTRL_FREE) ? CY_EOK : CY_ERROR);
             }
             break;
+        case IOCTL_MS8837_SLEEP_ENABLE:
+            if(pdesc && pdesc->sleep) {
+                retval = (pdesc->sleep(true) ? CY_EOK : CY_ERROR);
+            }
+            break;
+        case IOCTL_MS8837_SLEEP_DISABLE:
+            if(pdesc && pdesc->sleep) {
+                retval = (pdesc->sleep(false) ? CY_EOK : CY_ERROR);
+            }
+            break;
+        case IOCTL_DEVICE_POWER_ON:
+            if(pdesc && pdesc->power) {
+                retval = (pdesc->power(true) ? CY_EOK : CY_ERROR);
+            }
+            break;
+        case IOCTL_DEVICE_POWER_OFF:
+            if(pdesc && pdesc->power) {
+                retval = (pdesc->power(false) ? CY_EOK : CY_ERROR);
+            }
+            break;
         default:
             break;
     }

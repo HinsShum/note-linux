@@ -97,6 +97,8 @@ static bool _i2c_bus_start(i2c_bus_describe_t *pdesc)
 
 static void _i2c_bus_stop(i2c_bus_describe_t *pdesc)
 {
+    pdesc->ops.scl_set(false);
+    pdesc->ops.delay();
     pdesc->ops.sda_set(false);
     pdesc->ops.delay();
     pdesc->ops.scl_set(true);
@@ -105,7 +107,7 @@ static void _i2c_bus_stop(i2c_bus_describe_t *pdesc)
     pdesc->ops.delay();
 }
 
-static bool _i2c_wait_ack(i2c_bus_describe_t *pdesc)
+static inline bool _i2c_wait_ack(i2c_bus_describe_t *pdesc)
 {
     bool ack = false;
 
@@ -115,7 +117,6 @@ static bool _i2c_wait_ack(i2c_bus_describe_t *pdesc)
     pdesc->ops.delay();
     ack = !pdesc->ops.sda_get();
     pdesc->ops.scl_set(false);
-    pdesc->ops.delay();
 
     return ack;
 }
@@ -130,7 +131,6 @@ static bool _i2c_bus_write_byte(i2c_bus_describe_t *pdesc, uint8_t byte)
         pdesc->ops.delay();
     }
     pdesc->ops.scl_set(false);
-    pdesc->ops.delay();
 
     return _i2c_wait_ack(pdesc);
 }

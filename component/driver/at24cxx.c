@@ -169,8 +169,9 @@ static int32_t at24cxx_write(driver_t **pdrv, void *buf, uint32_t offset, uint32
                 memory_addr[1] = address & 0xFF;
             }
             msg.buf = (buf + actual_len);
-            if((length - actual_len) > pdesc->info.block_size) {
-                msg.len = pdesc->info.block_size;
+            if(((address + (length - actual_len)) & (~(pdesc->info.block_size - 1))) !=
+               (address & (~(pdesc->info.block_size - 1)))) {
+                msg.len = ((address + pdesc->info.block_size) & (~(pdesc->info.block_size - 1))) - address;
             } else {
                 msg.len = length - actual_len;
             }

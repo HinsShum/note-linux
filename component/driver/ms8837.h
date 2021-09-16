@@ -39,6 +39,8 @@ extern "C"
 #define IOCTL_MS8837_TURN_ON_BACKWARD                   (IOCTL_USER_START + 0x01)
 #define IOCTL_MS8837_TURN_ON_FREE                       (IOCTL_USER_START + 0x02)
 #define IOCTL_MS8837_TURN_OFF                           (IOCTL_USER_START + 0x03)
+#define IOCTL_MS8837_SLEEP_ENABLE                       (IOCTL_USER_START + 0x04)
+#define IOCTL_MS8837_SLEEP_DISABLE                      (IOCTL_USER_START + 0x05)
 
 /*---------- type define ----------*/
 typedef enum {
@@ -52,6 +54,8 @@ typedef struct {
     bool (*init)(void);
     void (*deinit)(void);
     bool (*ctrl)(ms8837_control_en ctrl);
+    bool (*sleep)(bool ctrl);
+    bool (*power)(bool ctrl);
 } ms8837_describe_t;
 
 /*---------- variable prototype ----------*/
