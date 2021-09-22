@@ -245,8 +245,8 @@ static int32_t fm13dt160_write(driver_t **pdrv, void *buf, uint32_t address, uin
             *p++ = _COMMAND_WRITE_MEMORY;
             *p++ = (address >> 8) & 0xFF;
             *p++ = address & 0xFF;
-            if((length - written_len) > 4) {
-                write_len = 4;
+            if(((address + (length - written_len)) & (~0x3)) != (address & (~0x03))) {
+                write_len = ((address + 0x04) & (~0x03)) - address;
             } else {
                 write_len = length - written_len;
             }

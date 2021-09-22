@@ -58,6 +58,7 @@ extern "C"
 #define FM13DT160_ADDRESS_ACCESS_PASSWD             (FM13DT160_SECTOR5_BASE + 0x04)
 #define FM13DT160_ADDRESS_EPC                       (FM13DT160_SECTOR5_BASE + 0x0C)
 #define FM13DT160_ADDRESS_TID                       (FM13DT160_SECTOR5_BASE + 0x20)
+#define FM13DT160_LOCK_CFG                          (FM13DT160_SECTOR5_BASE + 0x38)
 
 #define FM13DT160_USER_CFG0_IO_OD_LED               (0x01)
 #define FM13DT160_USER_CFG0_IO_IRQ                  (0x02)
