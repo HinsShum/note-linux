@@ -46,7 +46,7 @@ static int32_t timer_open(driver_t **pdrv)
     int32_t retval = CY_EOK;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->init) {
         retval = (pdesc->init() ? CY_EOK : CY_ERROR);
     }
@@ -59,7 +59,7 @@ static void timer_close(driver_t **pdrv)
     timer_describe_t *pdesc = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->deinit) {
         pdesc->deinit();
     }
@@ -71,7 +71,7 @@ static int32_t timer_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
     int32_t retval = CY_E_WRONG_ARGS;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     switch(cmd) {
         case IOCTL_TIMER_GET_INTERVAL:
             if(pdesc && args) {
@@ -118,7 +118,7 @@ static int32_t timer_irq_handler(driver_t **pdrv, uint32_t irq_handler, void *ar
     int32_t retval = CY_EOK;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->irq_handler) {
         retval = pdesc->irq_handler(irq_handler, args, len);
     }

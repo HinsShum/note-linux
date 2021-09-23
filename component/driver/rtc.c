@@ -46,7 +46,7 @@ static int32_t rtc_open(driver_t **pdrv)
     int32_t retval = CY_EOK;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->init) {
         retval = (pdesc->init() ? CY_EOK : CY_ERROR);
     }
@@ -59,7 +59,7 @@ static void rtc_close(driver_t **pdrv)
     rtc_describe_t *pdesc = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->deinit) {
         pdesc->deinit();
     }
@@ -72,7 +72,7 @@ static int32_t rtc_write(driver_t **pdrv, void *buf, uint32_t addition, uint32_t
     int32_t utc = -1;
 
     assert(pdrv && buf);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(len > sizeof(utc) || len == 0) {
             break;
@@ -93,7 +93,7 @@ static int32_t rtc_read(driver_t **pdrv, void *buf, uint32_t addition, uint32_t 
     int32_t utc = -1;
 
     assert(pdrv && buf);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(len > sizeof(utc) || len == 0) {
             break;

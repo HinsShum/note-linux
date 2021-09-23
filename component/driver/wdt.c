@@ -45,7 +45,7 @@ static int32_t wdt_open(driver_t **pdrv)
     int32_t retval = CY_EOK;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->init) {
         retval = (pdesc->init() ? CY_EOK : CY_ERROR);
     }
@@ -58,7 +58,7 @@ static void wdt_close(driver_t **pdrv)
     wdt_describe_t *pdesc = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->deinit) {
         pdesc->deinit();
     }
@@ -70,7 +70,7 @@ static int32_t wdt_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
     int32_t retval = CY_E_WRONG_ARGS;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     switch(cmd) {
         case IOCTL_WDT_FEED:
             if(pdesc && pdesc->feed) {

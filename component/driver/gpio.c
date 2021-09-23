@@ -46,7 +46,7 @@ static int32_t gpio_open(driver_t **pdrv)
     int32_t retval = CY_EOK;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->init) {
         retval = (pdesc->init() ? CY_EOK : CY_ERROR);
     }
@@ -59,7 +59,7 @@ static void gpio_close(driver_t **pdrv)
     gpio_describe_t *pdesc = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->deinit) {
         pdesc->deinit();
     }
@@ -72,7 +72,7 @@ static int32_t gpio_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
     bool *res = (bool *)args;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     switch(cmd) {
         case IOCTL_GPIO_GET:
             if(pdesc && pdesc->get && res) {
@@ -111,7 +111,7 @@ static int32_t gpio_irq_handler(driver_t **pdrv, uint32_t irq_handler, void *arg
     int32_t retval = CY_EOK;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->irq_handler) {
         retval = pdesc->irq_handler(irq_handler, args, len);
     }

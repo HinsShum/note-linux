@@ -72,7 +72,7 @@ static int32_t at24cxx_open(driver_t **pdrv)
     void *bus = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             __debug_error("AT24CXX driver has no describe field\n");
@@ -106,7 +106,7 @@ static void at24cxx_close(driver_t **pdrv)
     at24cxx_describe_t *pdesc = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc) {
         if(pdesc->bus) {
             device_close(pdesc->bus);
@@ -136,7 +136,7 @@ static int32_t at24cxx_write(driver_t **pdrv, void *buf, uint32_t offset, uint32
 
     assert(pdrv);
     assert(buf);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             __debug_error("AT24CXX driver has no describe field\n");
@@ -206,7 +206,7 @@ static int32_t at24cxx_read(driver_t **pdrv, void *buf, uint32_t offset, uint32_
 
     assert(pdrv);
     assert(buf);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             __debug_error("AT24CXX driver has no describe field\n");
@@ -420,7 +420,7 @@ static int32_t at24cxx_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
     ioctl_cb_func_t cb = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             __debug_error("AT24CXX has no describe field\n");

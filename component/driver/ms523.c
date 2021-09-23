@@ -393,7 +393,7 @@ static int32_t ms523_open(driver_t **pdrv)
     int32_t retval = CY_EOK;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->init) {
         if(pdesc->init()) {
             ms523_reset(pdesc);
@@ -416,7 +416,7 @@ static void ms523_close(driver_t **pdrv)
     ms523_describe_t *pdesc = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->deinit) {
         pdesc->deinit();
     }
@@ -639,7 +639,7 @@ static int32_t ms523_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
     int32_t retval = CY_E_WRONG_ARGS;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     switch(cmd) {
         case IOCTL_MS523_PCD_HALT:
             if(pdesc) {

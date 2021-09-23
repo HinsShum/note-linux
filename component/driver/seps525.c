@@ -225,7 +225,7 @@ static int32_t seps525_open(driver_t **pdrv)
     int32_t retval = CY_EOK;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->init) {
         retval = (pdesc->init() ? CY_EOK : CY_ERROR);
         if(CY_EOK == retval) {
@@ -241,7 +241,7 @@ static void seps525_close(driver_t **pdrv)
     seps525_describe_t *pdesc = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->deinit) {
         pdesc->deinit();
     }
@@ -254,7 +254,7 @@ static int32_t seps525_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
     seps525_ioctl_args_un *parg = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     switch(cmd) {
         case IOCTL_SEPS525_DRAW_PIXEL:
             if(pdesc && args) {

@@ -245,7 +245,7 @@ static int32_t yt8512x_open(driver_t **pdrv)
     int32_t retval = CY_EOK;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->init) {
         retval = pdesc->init();
         if(CY_EOK == retval) {
@@ -288,7 +288,7 @@ static void yt8512_close(driver_t **pdrv)
     motorcomm_yt8512x_describe_t *pdesc = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->deinit) {
         pdesc->deinit();
     }
@@ -377,7 +377,7 @@ static int32_t yt8512_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
     int32_t retval = CY_E_POINT_NONE;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     switch(cmd) {
         case IOCTL_YT8512X_SET_IRQ_HANDLER:
             if(pdesc) {
@@ -431,7 +431,7 @@ static int32_t yt8512_irq_handler(driver_t **pdrv, uint32_t irq_handler, void *a
     int32_t retval = CY_EOK;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->irq_handler) {
         retval = pdesc->irq_handler(irq_handler, args, len);
     }

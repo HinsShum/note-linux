@@ -73,7 +73,7 @@ static int32_t flash_open(driver_t **pdrv)
     int32_t retval = CY_E_WRONG_ARGS;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             __debug_error("Flash device has no describe field\n");
@@ -95,7 +95,7 @@ static void flash_close(driver_t **pdrv)
     flash_describe_t *pdesc = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->ops.deinit) {
         pdesc->ops.deinit();
     }
@@ -108,7 +108,7 @@ static int32_t flash_write(driver_t **pdrv, void *buf, uint32_t addition, uint32
 
     assert(pdrv);
     assert(buf);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->ops.write) {
         actual_len = pdesc->ops.write(buf, addition, len);
     }
@@ -123,7 +123,7 @@ static int32_t flash_read(driver_t **pdrv, void *buf, uint32_t addition, uint32_
 
     assert(pdrv);
     assert(buf);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->ops.read) {
         actual_len = pdesc->ops.read(buf, addition, len);
     }
@@ -256,7 +256,7 @@ static int32_t flash_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
     ioctl_cb_func_t cb = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             __debug_error("Flash device has no describe field\n");

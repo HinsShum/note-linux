@@ -32,6 +32,7 @@ extern "C"
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include "config/misc.h"
 
 /*---------- macro ----------*/
 #undef _DEV_SECTION_PREFIX
@@ -40,9 +41,6 @@ extern "C"
 #else
 #define _DEV_SECTION_PREFIX                     "."
 #endif
-
-#define container_of(ptr, type, member) ( \
-        (type *)((char *)ptr - offsetof(type, member)))
 
 #define DRIVER_DEFINED(name, open, close, write, read, ioctl, irq_handler) \
         driver_t driver_##name __attribute__((used, section(_DEV_SECTION_PREFIX "drv_defined"))) \

@@ -391,7 +391,7 @@ static int32_t zazxxx_open(driver_t **pdrv)
     int32_t retval = CY_EOK;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->serial.init) {
         retval = (pdesc->serial.init() ? CY_EOK : CY_ERROR);
     }
@@ -404,7 +404,7 @@ static void zazxxx_close(driver_t **pdrv)
     zazxxx_describe_t *pdesc = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->serial.deinit) {
         pdesc->serial.deinit();
     }
@@ -827,7 +827,7 @@ static int32_t zazxxx_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
     ioctl_cb_func_t cb = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             __debug_warn("No device bind to zazxxx driver module\n");
@@ -924,7 +924,7 @@ static int32_t zazxxx_irq_handler(driver_t **pdrv, uint32_t irq_handler, void *a
 
     assert(pdrv);
     assert(args || !len);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(pdesc->_private.state == RECV_STATE_BUSY) {
             break;

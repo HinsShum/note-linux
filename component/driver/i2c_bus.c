@@ -193,7 +193,7 @@ static int32_t i2c_bus_open(driver_t **pdrv)
     int32_t retval = CY_E_WRONG_ARGS;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             __debug_error("I2C bus has no describe field\n");
@@ -221,7 +221,7 @@ static void i2c_bus_close(driver_t **pdrv)
     i2c_bus_describe_t *pdesc = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->ops.deinit) {
         pdesc->ops.deinit();
     }
@@ -355,7 +355,7 @@ static int32_t i2c_bus_read_bytes(driver_t **pdrv, void *pbuf, uint32_t addition
     type_cb_func_t cb = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             __debug_error("I2C bus has no describe field\n");
@@ -383,7 +383,7 @@ static int32_t i2c_bus_write_bytes(driver_t **pdrv, void *pbuf, uint32_t additio
     type_cb_func_t cb = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             __debug_error("I2C bus has no describe field\n");
@@ -463,7 +463,7 @@ static int32_t i2c_bus_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
     ioctl_cb_func_t cb = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             __debug_error("I2C bus has no describe field\n");

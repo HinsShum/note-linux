@@ -172,7 +172,7 @@ static int32_t silkid_open(driver_t **pdrv)
     int32_t retval = CY_EOK;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->serial.init) {
         retval = (pdesc->serial.init() ? CY_EOK : CY_ERROR);
     }
@@ -185,7 +185,7 @@ static void silkid_close(driver_t **pdrv)
     silkid_describe_t *pdesc = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->serial.deinit) {
         pdesc->serial.deinit();
     }
@@ -422,7 +422,7 @@ static int32_t silkid_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
     int32_t retval = CY_EOK;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     switch(cmd) {
         case IOCTL_SILKID_GET_COMPORT:
             if(pdesc) {
@@ -562,7 +562,7 @@ static int32_t silkid_irq_handler(driver_t **pdrv, uint32_t irq_handler, void *a
 
     assert(pdrv);
     assert(args || !len);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     pack = (silkid_response_packet_t *)pdesc->normal.buf;
     while(len-- > 0) {
         silkid_irq_recv_pack(pdesc, *pdata++);

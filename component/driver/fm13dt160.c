@@ -152,7 +152,7 @@ static int32_t fm13dt160_open(driver_t **pdrv)
     void *bus = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             __debug_error("FM13DT160 driver has no describe field\n");
@@ -186,7 +186,7 @@ static void fm13dt160_close(driver_t **pdrv)
     fm13dt160_describe_t *pdesc = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc) {
         if(pdesc->bus) {
             device_close(pdesc->bus);
@@ -222,7 +222,7 @@ static int32_t fm13dt160_write(driver_t **pdrv, void *buf, uint32_t address, uin
     uint8_t write_len = 0;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             __debug_error("FM13DT160 driver has no descirbe field\n");
@@ -319,7 +319,7 @@ static int32_t fm13dt160_read(driver_t **pdrv, void *buf, uint32_t address, uint
     uint16_t crc = 0;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             __debug_error("FM13DT160 driver has no describe field\n");
@@ -583,7 +583,7 @@ static int32_t fm13dt160_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
     ioctl_cb_func_t cb = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             __debug_error("FM13DT160 has no describe field\n");

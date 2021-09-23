@@ -71,7 +71,7 @@ static int32_t serial_open(driver_t **pdrv)
     int32_t retval = CY_E_WRONG_ARGS;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             __debug_error("Serial device has no describe field\n");
@@ -93,7 +93,7 @@ static void serial_close(driver_t **pdrv)
     serial_describe_t *pdesc = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->ops.deinit) {
         pdesc->ops.deinit();
     }
@@ -105,7 +105,7 @@ static int32_t serial_write(driver_t **pdrv, void *buf, uint32_t addition, uint3
     uint16_t actual_len = 0;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->ops.dir_change && addition == SERIAL_WIRTE_CHANGE_DIR_AUTOMATICALLY) {
         pdesc->ops.dir_change(SERIAL_DIRECTION_TX);
     }
@@ -237,7 +237,7 @@ static int32_t serial_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
     ioctl_cb_func_t cb = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             __debug_error("Serial device has no describe field\n");
@@ -259,7 +259,7 @@ static int32_t serial_irq_handler(driver_t **pdrv, uint32_t irq_handler, void *a
     int32_t retval = CY_EOK;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->ops.irq_handler) {
         retval = pdesc->ops.irq_handler(irq_handler, args, len);
     }

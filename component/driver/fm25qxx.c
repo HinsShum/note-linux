@@ -266,7 +266,7 @@ static int32_t fm25qxx_open(driver_t **pdrv)
     int32_t retval = CY_EOK;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->flash.init) {
         retval = (pdesc->flash.init() ? CY_EOK : CY_ERROR);
         if(CY_EOK == retval) {
@@ -297,7 +297,7 @@ static void fm25qxx_close(driver_t **pdrv)
     fm25qxx_describe_t *pdesc = NULL;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     if(pdesc && pdesc->flash.deinit) {
         pdesc->flash.deinit();
     }
@@ -311,7 +311,7 @@ static int32_t fm25qxx_write(driver_t **pdrv, void *buf, uint32_t addr, uint32_t
 
     assert(pdrv);
     assert(buf);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             break;
@@ -339,7 +339,7 @@ static int32_t fm25qxx_read(driver_t **pdrv, void *buf, uint32_t addr, uint32_t 
 
     assert(pdrv);
     assert(buf);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     do {
         if(!pdesc) {
             break;
@@ -372,7 +372,7 @@ static int32_t fm25qxx_ioctl(driver_t **pdrv, uint32_t cmd, void *args)
     int32_t retval = CY_ERROR;
 
     assert(pdrv);
-    pdesc = container_of(pdrv, device_t, pdrv)->pdesc;
+    pdesc = container_of((void **)pdrv, device_t, pdrv)->pdesc;
     switch(cmd) {
         case IOCTL_FLASH_ERASE_PAGE:
             retval = CY_E_WRONG_ARGS;
