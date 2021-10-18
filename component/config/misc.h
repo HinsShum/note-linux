@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file config/misc.h
  *
  * Copyright (C) 2021
@@ -41,6 +41,11 @@ extern "C"
 #define container_of(ptr, type, member) ({                  \
         const typeof(((type *)0)->member) *__mptr = (ptr);  \
         (type *)((char *)__mptr - offsetof(type, member));})
+#elif defined(_MSC_VER)
+#define container_of(ptr, type, member) (                   \
+        (type *)((char *)ptr - offsetof(type, member)))
+#else
+#error "No container_of defined in this compiler"
 #endif
 
 /*---------- type define ----------*/
