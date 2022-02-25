@@ -71,6 +71,7 @@ void *simplefifo_new(void)
         if(array[i].state == STATE_IDLE) {
             array[i].state = STATE_BUSY;
             handler = &array[i];
+            break;
         }
     }
 
