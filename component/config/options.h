@@ -37,8 +37,6 @@ extern "C"
 #endif
 
 /*---------- macro ----------*/
-#define ARRAY_SIZE(x)                   (sizeof(x) / sizeof((x)[0]))
-
 /*---------- type define ----------*/
 /*---------- variable prototype ----------*/
 /*---------- function prototype ----------*/
